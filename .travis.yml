@@ -1,0 +1,24 @@
+language: scala
+
+scala:
+   - 2.11.8
+
+cache:
+  directories:
+    - $HOME/.m2/repository
+    - $HOME/.sbt
+    - $HOME/.ivy2
+
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION compile test
+
+  # Trick to avoid unnecessary cache updates
+  - find $HOME/.sbt -name "*.lock" | xargs rm
+
+jdk:
+   - oraclejdk8
+
+notifications:
+  email:
+    - diorman.colmenares@full360.com
+
