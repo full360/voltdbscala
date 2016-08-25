@@ -1,4 +1,4 @@
-# VoltDBScala
+# VoltDBScala     [![Build Status](https://travis-ci.org/full360/voltdbscala.svg?branch=master)](https://travis-ci.org/full360/voltdbscala)
 
 Contains a friendly scala wrapper for the VoltDB java client. It focuses on async procedure calls, although you could also make use of a sync approach if you like to.
 
