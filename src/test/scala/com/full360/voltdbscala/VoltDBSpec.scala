@@ -73,15 +73,15 @@ class VoltDBSpec extends WordSpec with Matchers with ScalaFutures {
     }
 
     "wrap sync procedure calls" in {
-      voltdbMocked.callProcedureSync("testProc")(123, "hello world") shouldBe a[ClientResponse]
+      voltdbMocked.callProcedureSync("testProc", 123, "hello world") shouldBe a[ClientResponse]
     }
 
     "wrap async procedure calls" in {
-      voltdbMocked.callProcedure("testProc")(123, "hello world") shouldBe a[Future[_]]
+      voltdbMocked.callProcedure("testProc", 123, "hello world") shouldBe a[Future[_]]
     }
 
     "call procedures synchronously parsing first result set" in {
-      val result = voltdbMocked.callProcedureAndMapResultSync("testProc")(123, "hello world") { row ⇒
+      val result = voltdbMocked.callProcedureAndMapResultSync("testProc", 123, "hello world") { row ⇒
         TestObj(row.getString(0), row.getString(1))
       }
 
@@ -91,7 +91,7 @@ class VoltDBSpec extends WordSpec with Matchers with ScalaFutures {
     }
 
     "call procedures asynchronously parsing first result set" in {
-      val futureResult = voltdbMocked.callProcedureAndMapResult("testProc")(123, "hello world") { row ⇒
+      val futureResult = voltdbMocked.callProcedureAndMapResult("testProc", 123, "hello world") { row ⇒
         TestObj(row.getString(0), row.getString(1))
       }
 

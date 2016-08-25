@@ -45,7 +45,7 @@ trait VoltDB {
    * @param params the parameters to send to the stored procedure
    * @return the ClientResponse instance of the procedure call
    */
-  def callProcedureSync(procedureName: String)(params: Any*): ClientResponse =
+  def callProcedureSync(procedureName: String, params: Any*): ClientResponse =
     client.callProcedure(procedureName, paramsToJavaObjects(params: _*): _*)
 
   /**
@@ -57,9 +57,9 @@ trait VoltDB {
    * @tparam T the type the rows are parsed to
    * @return an immutable Vector of given type containing the parsed rows
    */
-  def callProcedureAndMapResultSync[T](procedureName: String, resultIndex: Int = 0)(params: Any*)(f: VoltTableRow ⇒ T): Vector[T] = {
+  def callProcedureAndMapResultSync[T](procedureName: String, params: Any*)(f: VoltTableRow ⇒ T): Vector[T] = {
     val cr = client.callProcedure(procedureName, paramsToJavaObjects(params: _*): _*)
-    mapClientResponse[T](cr, resultIndex)(f)
+    mapClientResponse[T](cr, 0)(f)
   }
 
   /**
@@ -68,7 +68,7 @@ trait VoltDB {
    * @param params the parameters to send to the stored procedure
    * @return a Future that eventually will hold the ClientResponse
    */
-  def callProcedure(procedureName: String)(params: Any*): Future[ClientResponse] = {
+  def callProcedure(procedureName: String, params: Any*): Future[ClientResponse] = {
     val promise = Promise[ClientResponse]()
     val future = promise.future
 
@@ -89,8 +89,8 @@ trait VoltDB {
    * @param params the parameters to send to the stored procedure
    * @return a Future that eventually will hold an immutable Vector of given type containing the parsed rows
    */
-  def callProcedureAndMapResult[T](procedureName: String, resultIndex: Int = 0)(params: Any*)(f: VoltTableRow ⇒ T): Future[Vector[T]] =
-    callProcedure(procedureName)(paramsToJavaObjects(params: _*): _*).map(mapClientResponse[T](_, resultIndex)(f))
+  def callProcedureAndMapResult[T](procedureName: String, params: Any*)(f: VoltTableRow ⇒ T): Future[Vector[T]] =
+    callProcedure(procedureName, paramsToJavaObjects(params: _*): _*).map(mapClientResponse[T](_, 0)(f))
 
   /**
    * Connects to servers passed in. If it fails connecting to any address it throws an exception
