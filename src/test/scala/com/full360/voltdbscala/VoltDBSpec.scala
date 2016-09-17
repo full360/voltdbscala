@@ -2,9 +2,9 @@ package com.full360.voltdbscala
 
 import com.full360.voltdbscala.util.VoltTableBuilder
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 import org.voltdb.client._
-import org.voltdb.{ VoltTable, VoltType }
+import org.voltdb.{VoltTable, VoltType}
 
 import scala.concurrent.Future
 import scala.util.Try

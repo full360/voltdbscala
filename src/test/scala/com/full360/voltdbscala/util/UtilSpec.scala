@@ -1,7 +1,7 @@
 package com.full360.voltdbscala.util
 
-import org.scalatest.{ Matchers, WordSpec }
-import org.voltdb.{ VoltTable, VoltTableRow, VoltType }
+import org.scalatest.{Matchers, WordSpec}
+import org.voltdb.{VoltTable, VoltTableRow, VoltType}
 import org.voltdb.client.TestClientResponse
 
 class UtilSpec extends WordSpec with Matchers {

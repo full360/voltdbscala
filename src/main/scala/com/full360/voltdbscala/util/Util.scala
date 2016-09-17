@@ -2,7 +2,7 @@ package com.full360.voltdbscala.util
 
 import com.full360.voltdbscala.VoltDB
 import org.voltdb.client.ClientResponse
-import org.voltdb.{ VoltTable, VoltTableRow }
+import org.voltdb.{VoltTable, VoltTableRow}
 import scala.annotation.tailrec
 import scala.collection.immutable.Vector
 

@@ -1,10 +1,10 @@
 package com.full360.voltdbscala
 
 import com.full360.voltdbscala.util.Util._
-import org.voltdb.client.{ Client, ClientConfig, ClientFactory, ClientResponse, ProcedureCallback }
+import org.voltdb.client.{Client, ClientConfig, ClientFactory, ClientResponse, ProcedureCallback}
 import org.voltdb.VoltTableRow
-import scala.concurrent.{ Future, Promise }
-import scala.util.{ Failure, Success, Try }
+import scala.concurrent.{Future, Promise}
+import scala.util.{Failure, Success, Try}
 import scala.concurrent.ExecutionContext
 
 object VoltDB {
