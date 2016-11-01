@@ -1,58 +1,85 @@
 # VoltDBScala     [![Build Status](https://travis-ci.org/full360/voltdbscala.svg?branch=master)](https://travis-ci.org/full360/voltdbscala)
 
-Contains a friendly scala wrapper for the VoltDB java client. It focuses on async procedure calls, although you could also make use of a sync approach if you like to.
+Scala wrapper for the VoltDB java client.
 
-# Example
+## Usage
 
-Here's an quick example of how to implement the VoltDB wrapper
+### Basic example
 
 ```scala
-import com.full360.voltdbscala.VoltDB
-import org.voltdb.client.ClientConfig
-import org.voltdb.VoltTableRow
+import org.voltdb.client.ClientResponse
+import scala.concurrent.Future
 
-// Domain class
-case class User(id: Long, name: String)
+// Scala client wrapper
+import com.full360.voltdbscala.Client
 
-class MyProjectVoltDB(override val username: String, override val password: String) extends VoltDB {
+val client = Client()
 
-  import com.full360.voltdbscala.util.Util._
+// Synchronous example
+val response: ClientResponse = client.callProcedure("SampleProc", 123, "abc")
 
-  // Example of overriding default configuration
-  override def config: ClientConfig = {
-    val config = super.config
-    config.setReconnectOnConnectionLoss(true)
-    config
-  }
-
-  // Async procedure wrapper
-  def getUserById(id: Long): Future[Option[User]] = {
-    def parser(row: VoltTableRow) = User(row.getLong(0), row.getString(1))
-
-    /**
-     * Parameters:
-     * "GetUserById": SP name
-     * id: SP parameter
-     * parser: function that maps a VoltTableRow to a domain instance
-     * toSingleResult: function provided by com.full360.voltdbscala.util.Util that returns scala Option
-     * based on the result of the SP call
-     */
-    callProcedureAndMapResult("GetUserById", id)(parser).map(toSingleResult)
-  }
-}
+// Asynchronous example
+val responseAsync: Future[ClientResponse] = client.callProcedureAsync("SampleProc", 123, "abc")
 ```
 
+Note: You can pass Option[T] as parameter to procedure calls which is translated to its value if present or null
+
+### Utilities
+
+#### ClientResponse utilities
+
 ```scala
+import org.voltdb.client.ClientResponse
+import org.voltdb.VoltTableRow
+import scala.concurrent.Future
+import com.full360.voltdbscala.Client
 
-val voltdb = new MyProjectVoltDB("user", "password")
+// Implicit map methods
+import com.full360.voltdbscala.ClientResponseUtils.MapMethodSupport
 
-// Connect to multiple nodes. This will attempt to connecto to host1:1234 and host2:21212
-// It returns an Seq of Try[Unit] to reason about failing attempts
-voltdb.connect("host1:1234", "host2")
+val client = Client()
 
-// If you want an exception to be thrown in case one the attempts failed, use this instead
-voltdb.connectOrFail("host1:1234", "host2")
+case class User(id: String, name: String)
 
-// Calling SP wrappers
-val futureUser: Future[Option[User]] = voltdb.getUserById(12345)
+def userFromRow(row: VoltTableRow): User = User(row.getString("id"), row.getString("name"))
+
+// Synchronous example
+val users: Seq[User] = client.callProcedure("GetUsers").map(0)(userFromRow)
+val user: Option[User] = client.callProcedure("GetUser", "xyz").mapFirstRow(0)(userFromRow)
+
+// Asynchronous example
+val usersAsync: Future[Seq[User]] = client.callProcedureAsync("GetUsers").map(_.map(0)(userFromRow))
+val userAsync: Future[Option[User]] = client.callProcedureAsync("GetUser", "xyz").map(_.mapFirstRow(0)(userFromRow))
+```
+
+#### VoltTableRow utilities
+
+```scala
+import org.voltdb.client.ClientResponse
+import org.voltdb.VoltTableRow
+import scala.concurrent.Future
+import com.full360.voltdbscala.Client
+import com.full360.voltdbscala.ClientResponseUtils.MapMethodSupport
+
+// VoltTableRow implicit methods
+import com.full360.voltdbscala.VoltTableRowUtils.{ ToOptionMethodSupport, GetLongAsBooleanMethodSupport }
+
+val client = Client()
+
+case class User(id: String, name: String, active: Boolean, githubAccount: Option[String])
+
+def userFromRow(row: VoltTableRow): User =
+  User(
+    id = row.getString("id"),
+    name = row.getString("name"),
+    
+    // returns true if value is 1
+    active = row.getLongAsBoolean("active"),
+    
+    // returns None if row.wasNull is true or Some(value) otherwise  
+    githubAccount = row.toOption(row.getString("github_account"))
+  )
+
+// Synchronous example
+val users: Seq[User] = client.callProcedure("GetUsers").map(0)(userFromRow)
 ```
