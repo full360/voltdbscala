@@ -18,6 +18,8 @@ object ProjectSettings {
 
     scalacOptions ++= scalacOptions_,
 
+    scalacOptions in (Compile, doc) ++= Seq("-no-link-warnings"),
+
     pomExtra := pomExtra_,
 
     parallelExecution in Test := false,
