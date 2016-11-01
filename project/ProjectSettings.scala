@@ -10,7 +10,7 @@ object ProjectSettings {
 
     organization := "com.full360",
 
-    version := "0.1.0",
+    version := "0.2.0-SNAPSHOT",
 
     scalaVersion := "2.11.8",
 
@@ -19,6 +19,8 @@ object ProjectSettings {
     scalacOptions ++= scalacOptions_,
 
     pomExtra := pomExtra_,
+
+    parallelExecution in Test := false,
 
     credentials += Credentials(
       "Sonatype Nexus Repository Manager",
@@ -29,9 +31,9 @@ object ProjectSettings {
   ) ++ formatSettings
 
   lazy val libraryDependencies_ = Seq(
-    "org.voltdb"              % "voltdbclient"   % "6.5"   % "provided",
-    "org.scala-lang.modules"  % "scala-xml_2.11" % "1.0.5" % "provided",
-    "org.scalatest"          %% "scalatest"      % "3.0.0" % "test"
+    "org.voltdb"              % "voltdbclient"   % "6.7",
+    "org.scalatest"          %% "scalatest"      % "3.0.0" % "test",
+    "org.mockito"             % "mockito-all"    % "1.9.5" % "test"
   )
 
   lazy val scalacOptions_ = Seq(
