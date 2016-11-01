@@ -5,7 +5,8 @@ import java.net.InetSocketAddress
 import java.util.List
 import VoltBulkLoader._
 
-trait TestClient extends Client with ReplicaProcCaller {
+trait TestClient extends Client {
+
   override def createConnection(host: String): Unit = ???
 
   override def createConnection(host: String, port: Int): Unit = ???
@@ -56,7 +57,7 @@ trait TestClient extends Client with ReplicaProcCaller {
 
   override def writeSummaryCSV(stats: ClientStats, path: String): Unit = ???
 
-  override def callProcedure(originalTxnId: Long, originalTimestamp: Long, callback: ProcedureCallback, procName: String, parameters: AnyRef*): Boolean = ???
+  override def callAllPartitionProcedure(procedureName: String, params: AnyRef*): Array[ClientResponseWithPartitionKey] = ???
 
-  override def callProcedure(originalTxnId: Long, originalTimestamp: Long, procName: String, parameters: AnyRef*): ClientResponse = ???
+  override def callAllPartitionProcedure(callback: AllPartitionProcedureCallback, procedureName: String, params: AnyRef*): Boolean = ???
 }
