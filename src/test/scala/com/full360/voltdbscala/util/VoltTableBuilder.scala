@@ -1,6 +1,7 @@
 package com.full360.voltdbscala.util
 
 import org.voltdb.{VoltTable, VoltType}
+
 import scala.annotation.tailrec
 
 /**
@@ -16,7 +17,7 @@ object VoltTableBuilder {
    *          and it must return the value to be stored in the table cell
    * @return the VoltTable object created
    */
-  def build(columnTypes: Seq[VoltType], nRows: Int = 1)(f: (Int, Int) ⇒ AnyRef): VoltTable = {
+  def build(nRows: Int, columnTypes: VoltType*)(f: (Int, Int) ⇒ AnyRef): VoltTable = {
     val voltTable = new VoltTable(buildColumns(columnTypes))
 
     for (rowIndex ← 1 to nRows) {
