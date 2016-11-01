@@ -22,7 +22,8 @@ val response: ClientResponse = client.callProcedure("SampleProc", 123, "abc")
 val responseAsync: Future[ClientResponse] = client.callProcedureAsync("SampleProc", 123, "abc")
 ```
 
-Note: You can pass Option[T] as parameter to procedure calls which is translated to its value if present or null
+Note: You can pass an instance of Option[T] as parameter to procedure calls which is translated to its value
+if present or null
 
 ### Utilities
 
