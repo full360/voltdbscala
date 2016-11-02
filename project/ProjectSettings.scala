@@ -33,7 +33,7 @@ object ProjectSettings {
   ) ++ formatSettings
 
   lazy val libraryDependencies_ = Seq(
-    "org.voltdb"              % "voltdbclient"   % "6.7",
+    "org.voltdb"              % "voltdbclient"   % "6.6" % "provided",
     "org.scalatest"          %% "scalatest"      % "3.0.0" % "test",
     "org.mockito"             % "mockito-all"    % "1.9.5" % "test"
   )
