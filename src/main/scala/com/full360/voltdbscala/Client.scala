@@ -239,9 +239,3 @@ trait Client {
     future
   }
 }
-
-/**
- * Exception thrown when an asynchronous procedure call is not queued
- * @param message the detail message of this exception
- */
-case class ProcedureNotQueuedException(message: String) extends Exception(message)
