@@ -20,7 +20,6 @@ class ClientTest extends WordSpec with Matchers with ScalaFutures with MockitoSu
 
   def newClient(jClient: org.voltdb.client.Client = mock[org.voltdb.client.Client]) = new Client {
     override def javaClient = jClient
-    override implicit val executionContext: ExecutionContext = ec
   }
 
   def emptyClientResponse = new TestClientResponse { override def getResults: Array[VoltTable] = Array() }
@@ -28,10 +27,6 @@ class ClientTest extends WordSpec with Matchers with ScalaFutures with MockitoSu
   "Client" must {
     "respond to #javaClient" in {
       newClient().javaClient shouldBe a[org.voltdb.client.Client]
-    }
-
-    "respond to #executionContext" in {
-      newClient().executionContext shouldBe ExecutionContext.global
     }
 
     "respond to #callProcedure" in {

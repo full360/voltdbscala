@@ -16,10 +16,9 @@ object Client {
    * instead of when invoking createConnection.</p>
    *
    * @param config ClientConfig object specifying what type of client to create
-   * @param ec ExecutionContext required by scala futures for async calls
    * @return a configured com.full360.voltdbscala.Client
    */
-  def apply(config: Option[ClientConfig] = None, ec: ExecutionContext = ExecutionContext.global): Client = {
+  def apply(config: Option[ClientConfig] = None): Client = {
     val jc = config match {
       case Some(c) ⇒ ClientFactory.createClient(c)
       case None    ⇒ ClientFactory.createClient()
@@ -27,7 +26,6 @@ object Client {
 
     new Client {
       override def javaClient = jc
-      implicit val executionContext = ec
     }
   }
 
@@ -47,11 +45,6 @@ trait Client {
    * VoltDB java client.
    */
   def javaClient: jclient.Client
-
-  /**
-   * Execution context for scala futures.
-   */
-  implicit val executionContext: ExecutionContext
 
   /**
    * <p>Synchronously invokes a procedure. Blocks until a result is available.
@@ -79,7 +72,7 @@ trait Client {
    * @param parameters vararg list of procedure's parameter values.
    * @return a scala Future holding an instance of a [[org.voltdb.client.ClientResponse ClientResponse]] or exception.
    */
-  def callProcedureAsync(procName: String, parameters: Any*): Future[ClientResponse] =
+  def callProcedureAsync(procName: String, parameters: Any*)(implicit ec: ExecutionContext): Future[ClientResponse] =
     handleAsyncProcCall[ClientResponse] { promise ⇒
       val cb = procedureCallback(promise.success(_))
       javaClient.callProcedure(cb, procName, paramsToJavaObjects(parameters: _*): _*)
@@ -104,7 +97,7 @@ trait Client {
    * @param classesToDelete comma-separated list of classes to delete.  May be null.
    * @return a scala Future holding an instance of a [[org.voltdb.client.ClientResponse ClientResponse]] or exception.
    */
-  def updateClassesAsync(jarPath: File, classesToDelete: String): Future[ClientResponse] =
+  def updateClassesAsync(jarPath: File, classesToDelete: String)(implicit ec: ExecutionContext): Future[ClientResponse] =
     handleAsyncProcCall[ClientResponse] { promise ⇒
       val cb = procedureCallback(promise.success(_))
       javaClient.updateClasses(cb, jarPath, classesToDelete)
@@ -123,7 +116,7 @@ trait Client {
    * @param deploymentPath Path to the deployment file.
    * @return a scala Future holding an instance of a [[org.voltdb.client.ClientResponse ClientResponse]] or exception.
    */
-  def updateApplicationCatalogAsync(catalogPath: File, deploymentPath: File): Future[ClientResponse] =
+  def updateApplicationCatalogAsync(catalogPath: File, deploymentPath: File)(implicit ec: ExecutionContext): Future[ClientResponse] =
     handleAsyncProcCall[ClientResponse] { promise ⇒
       val cb = procedureCallback(promise.success(_))
       javaClient.updateApplicationCatalog(cb, catalogPath, deploymentPath)
@@ -175,7 +168,7 @@ trait Client {
    * @return a scala Future holding an sequence of
    *         [[org.voltdb.client.ClientResponseWithPartitionKey ClientResponseWithPartitionKey]] or exception.
    */
-  def callAllPartitionProcedureAsync(procName: String, parameters: Any*): Future[Seq[ClientResponseWithPartitionKey]] =
+  def callAllPartitionProcedureAsync(procName: String, parameters: Any*)(implicit ec: ExecutionContext): Future[Seq[ClientResponseWithPartitionKey]] =
     handleAsyncProcCall[Seq[ClientResponseWithPartitionKey]] { promise ⇒
       val cb = allPartitionProcedureCallback(promise.success(_))
       javaClient.callAllPartitionProcedure(cb, procName, paramsToJavaObjects(parameters: _*): _*)
@@ -215,7 +208,7 @@ trait Client {
    * @param parameters   vararg list of procedure's parameter values.
    * @return a scala Future holding an instance of a [[org.voltdb.client.ClientResponse ClientResponse]] or exception.
    */
-  def callProcedureWithTimeoutAsync(queryTimeout: Int, procName: String, parameters: Any*): Future[ClientResponse] =
+  def callProcedureWithTimeoutAsync(queryTimeout: Int, procName: String, parameters: Any*)(implicit ec: ExecutionContext): Future[ClientResponse] =
     handleAsyncProcCall[ClientResponse] { promise ⇒
       val cb = procedureCallback(promise.success(_))
       javaClient.callProcedureWithTimeout(cb, queryTimeout, procName, paramsToJavaObjects(parameters: _*): _*)
@@ -227,7 +220,7 @@ trait Client {
    * @tparam T Type of the resulting Future
    * @return a scala Future
    */
-  protected def handleAsyncProcCall[T](f: Promise[T] ⇒ Boolean): Future[T] = {
+  protected def handleAsyncProcCall[T](f: Promise[T] ⇒ Boolean)(implicit ec: ExecutionContext): Future[T] = {
     val promise = Promise[T]()
     val future = promise.future
     val isQueued = f(promise)
