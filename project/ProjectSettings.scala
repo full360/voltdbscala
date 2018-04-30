@@ -10,9 +10,11 @@ object ProjectSettings {
 
     organization := "com.full360",
 
-    version := "0.4.0-SNAPSHOT",
+    version := "0.5.0-SNAPSHOT",
 
-    scalaVersion := "2.11.8",
+    scalaVersion := "2.11.12",
+
+    crossScalaVersions := Seq("2.11.12", "2.12.6"),
 
     libraryDependencies ++= libraryDependencies_,
 
@@ -52,6 +54,7 @@ object ProjectSettings {
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
     "-Xfuture",
+    "-Xlint:-unused",
     "-Ywarn-unused-import"
   )
 
