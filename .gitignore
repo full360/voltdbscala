@@ -1,20 +1,20 @@
-## SBT specific
+# Created by .ignore support plugin (hsz.mobi)
+### Scala template
+*.class
+*.log
+
+# sbt specific
+.cache
+.history
+.lib/
+dist/*
 target/
-# lib_managed/
-# src_managed/
-# project/boot/
-# .cache
-# .history
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
 
-## IntelliJ IDEA specific
-.idea/
-# *.iml
-# *.sc
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
 
-## Scala-IDE specific
-# .scala_dependencies
-# .worksheet
-
-## GPG
-.pubring.gpg
-.secring.gpg

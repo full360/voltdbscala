@@ -2,7 +2,6 @@ import sbt._
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import Keys._
-import com.typesafe.sbt.SbtPgp.autoImportImpl.{ pgpPassphrase, pgpPublicRing, pgpSecretRing }
 
 object ProjectSettings {
 
@@ -30,12 +29,8 @@ object ProjectSettings {
     credentials += Credentials(
       "Sonatype Nexus Repository Manager",
       "oss.sonatype.org",
-      sys.env.getOrElse("SONATYPE_USERNAME", ""),
-      sys.env.getOrElse("SONATYPE_PASSWORD", "")),
-
-    pgpSecretRing := file(".secring.gpg"),
-    pgpPublicRing := file(".pubring.gpg"),
-    pgpPassphrase := sys.env.get("SONATYPE_KEY_PASSPHRASE").map(_.toArray)
+      sys.props("sonatype.username"),
+      sys.props("sonatype.password"))
 
   ) ++ formatSettings
 
