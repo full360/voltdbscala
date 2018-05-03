@@ -1,7 +1,8 @@
 language: scala
 
 scala:
-   - 2.11.8
+   - 2.11.12
+   - 2.12.6
 
 cache:
   directories:
@@ -10,15 +11,36 @@ cache:
     - $HOME/.ivy2
 
 script:
+  # - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+  # - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
   - sbt ++$TRAVIS_SCALA_VERSION compile test
 
-  # Trick to avoid unnecessary cache updates
-  - find $HOME/.sbt -name "*.lock" | xargs rm
+before_cache:
+  # Tricks to avoid unnecessary cache updates
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt -name "*.lock" -delete
+
+before_install:
+  - openssl aes-256-cbc -k "$ENC_PASSWORD" -in .secring.gpg.enc -out .secring.gpg -d
+  - openssl aes-256-cbc -k "$ENC_PASSWORD" -in .pubring.gpg.enc -out .pubring.gpg -d
+
+after_success:
+  - '[ "${TRAVIS_BRANCH}" = "master" ] && [ "${BRANCH}" = "master" ] && sbt ++$TRAVIS_SCALA_VERSION publishSigned && sbt ++$TRAVIS_SCALA_VERSION sonatypeRelease || true'
 
 jdk:
    - oraclejdk8
 
 notifications:
   email:
-    - diorman.colmenares@full360.com
+    - pedro.diaz@full360.com
 
+env:
+  global:
+    # SONATYPE_USERNAME
+    # SONATYPE_PASSWORD
+    # SONATYPE_KEY_PASSPHRASE
+    # ENC_PASSWORD
+    - secure: V6E4h5XbzQPs+ikqcoC/WIc75MxTh6wt8z9yKaHgAlCun4V3LLUPQiZv8ihrzHBwDwUTUqjm+REKXOhYIx9qFY8KuirvFZUMzygN63c/o7LanVpdgdnbHv5bppl0AwJAS+3ZnytKivqLA9bqYW4aE0IvhaEpLzcHLLm4sJ+4r1Mx6Uly3olHsNPZoFtE7kJo0afryS8nwBSaqFzTSZDX9VGgPvCuKbVZ4jC2DmP72fxOTtKK4Zv2ySWvGPeXF9eNugLblaS44R4XhVCW5HBzIH8TKOOQKW/BacfBsKLoV2LDjNNTRS9fdvwSM0bRoKyIuOX3Ef1VjTYF5T4GPT2HPbcSKnFZJKK7AATnwFIeIKcRivZUAKfEkkdpW9TiaP8xT64XblV3QeNiCpuSOKExxAdek9gCqvD4EwZNi/nQ0A3AtzAB+jl9O0yzHkW+IxtZDLa5Brb0iwZoYLyxttKCOLCr91oysnfn12FHIQIfKwnLZBFzsn0689WynIEJEFoRnfFDylc0uwPByfZfD+Eqhk5gVizGtnh/eFvUYnrzhgdq8g7O96ONvYz+FiTU1YHaBLpITt3PdeU7cfo1WCyf2bMpz2S09JF/Gsf8TbijKgIMfjuDHJsT7uzTZHunGNxFkZSSbUgeZGpwBJ/sCf7VmRLIMy+Bbkx6IxHJijo2yGY=
+    - secure: asvNlfrzNxz2PoWB+GFWApfGa1AMB9RT2HmISiJx6A+NAtNQNnAeYzqPvHMqq3EHAR4tmQUp95vzQqJ8I9uDnKwfwUmZLXyz09nUbK7UEDcT1+2TN+b7LNdVh+Ac66qXQIRLcTLr4cwUrFGz3ddSEHL7IEvDJ9I1RsD+zBwS4ey9oWwqSU8nranGyEfLz6eFVAyhCdTln02QYhcAHfJ+WexUXnNrWyDbOdcU9CajXArdoyi+xah2E5AGtaQEMLmkYE/Mgf9kRltCsrnOn6NUbVQxzTtQarz5OLVy9+Gt5MmGglMEw1UHLTWbGkw510g/S+lYSJwL/00HNoQN80XqtFjGAmytHwBZvp74tS+dZAMDz+Z5wCjVSm9X8gk+7Xjm+J7xNDLA4np8P1njCpCaWddl1sPOYZhpowGc+UxyHHMDHO53ALG5rYUGXTDhpzrbyNb/OxXQCp8CwCxtNUhI790dvZhbwuB0R820H4cAbiE4DKg7yAAbrmQ8tLu9BOvvgXqGmpwYSdQdrSMUP0Oeat9mu7xGldo881pUZiEGgpgG5067SD0FRH8tVbR4P3EHXf1iDmMqRe4tJXxHp2MXtK5KKuB9x2UtRA7UHsZMAK53G2VyXWYpVI/Y3WMjDeixMLLnwbtlOTine1ibGuTrJlNNea22cGVvPmELlb2iX9Q=
+    - secure: ara4PXAoZTYG3Jb4QDMbKCBdJvgjjjzBYb6hn7L2MpFh2PiAJgd0xq11caKK7QXJ70UpVyT5e9z6rXrKI/y+xm5cFvWVTHDE24Tc3Dw/7yTDY7Cg/08pgDdfAi3KHIM6xHg69JNs7+5rLfwN1Hk5obD4+0z7IA33QcpF0dKduk/ZTYkezQ2ISxesdOnd+YRwWkrV8jaV+6nH7YVu6jaZIlfVeRRMcR7nHrNkNTTyTXJFlKBvnXhlmMlOpj1uxTNDSlJgLT86EdB3U+0Seg4pewcQB8r3XMQoasGT2KM075shYsAl9e/SiQoj06DSe2sYJFxZRYJrcsYKp4/xCAAymQ/KAgfe5czQ3R2kIqq7JuXOn1QJeKGt2jL0gnwx9orHhdBMExASjf5LXGhfEH+fg/UKmiApSfIlU8njF+9g27Yzt4bWi86Uoi8bV0KQTy5Ts7aAAOrtQ8/SSwftIJKsdgrWqzbyKIsm7Fh/G4foYdzPVw7MvXoIIS0uZ5vAEFdMWsnghMhTPxXCys3UxvifOP1QZwqXiEcFxkJeQqrspNzu8ZB8UJ6MVOxhRFMX7ThvA70ttxLDMagB9t9+aA4hHS3fXqUmzijr5vN7Ij2+ACYxNDCTv5vkkC2os4CrgiDWz5iLbBH7e8XIYHmdN6NYaWL48ru6TIKOVFefHziUOb4=
+    - secure: oUBklhmKFVgJ8XTpc7hR7CuYmdWP2CsEPq0OwTe/diWUc0B1LOOrFHqTz9qBq4VrFSdRfC+XPsFNtoPhFpr7paBX1gS4WQckS1yhcbrUjt0uUez5X4nMaUd5Bcz8OuJKIm+Bjf55c6SajyC1G9t0GLpSwgstJJWQ/xK+bcYluNv7mXE6Di+k7/U+s1COpq1DlDXCAF2UkEfl6+jG9hJmWASbJ68ssh6OuPiXnlHpqHARTH5A2Cw+5j6uS8e8MsL4SBvgBiYAA8bvA2SgGrzhU2XgbCdxc8kBlTDCSLkJ84pkkXz88wwdcqVgBpNQWeMj7aB8Ba4QnL7Xt8TnkOlZw68J6AjA4j+g5eWO3fxHBiSHZ8kIW8w/KGkru1FIfyeAiGa2PBtIhOIW9+eGjoaQv1g3jFQfmbJCyv674sNsR3qBY3GQbNzL9SM9Kc0XwVFV74xXJbLDA8bNKoSPnbyVNXCk8j4B1J3DQQQYHiY6LSFJQ4jPu5V+GW1yFE2+/XUTwEriMdkFi5DU1OSxDKucYORJ6/5diH//cIQV9uM/TO7EWUvg2tAYTrsHr/JRPrkZJVmKQST3CG5b9aCtwB+gJ+1aMfd6P3E8OFI4L5NK/DrkwxnhUrRwRcf+7diYYJPvsEx51SzmnvOq1dKl54uBJf7qiTM7Uc0ccWelkBUVWTI=
