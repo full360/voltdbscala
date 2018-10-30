@@ -40,7 +40,7 @@ object ProjectSettings {
   ) ++ formatSettings
 
   lazy val libraryDependencies_ = Seq(
-    "org.voltdb"              % "voltdbclient"   % "6.8" % "provided",
+    "org.voltdb"              % "voltdbclient"   % "8.3" % "provided",
     "org.scalatest"          %% "scalatest"      % "3.0.0" % "test",
     "org.mockito"             % "mockito-all"    % "1.9.5" % "test"
   )
@@ -59,7 +59,6 @@ object ProjectSettings {
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
     "-Xfuture",
-    "-Xlint:-unused",
     "-Ywarn-unused-import"
   )
 
