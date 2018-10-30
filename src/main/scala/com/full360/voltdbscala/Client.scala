@@ -110,16 +110,14 @@ trait Client {
    * not be queued. The resulting Future will contain a
    * [[com.full360.voltdbscala.ProcedureNotQueuedException ProcCallException]] if queueing did not take place.</p>
    *
-   * @see [[org.voltdb.client.Client#updateApplicationCatalog(org.voltdb.client.ProcedureCallback, java.io.File, java.io.File) Client.updateApplicationCatalog]]
-   *
    * @param catalogPath    Path to the catalog jar file.
    * @param deploymentPath Path to the deployment file.
    * @return a scala Future holding an instance of a [[org.voltdb.client.ClientResponse ClientResponse]] or exception.
    */
-  def updateApplicationCatalogAsync(catalogPath: File, deploymentPath: File)(implicit ec: ExecutionContext): Future[ClientResponse] =
+  def updateApplicationCatalogAsync(catalogPath: String, deploymentPath: String)(implicit ec: ExecutionContext): Future[ClientResponse] =
     handleAsyncProcCall[ClientResponse] { promise ⇒
       val cb = procedureCallback(promise.success(_))
-      javaClient.updateApplicationCatalog(cb, catalogPath, deploymentPath)
+      javaClient.callProcedure(cb, "@UpdateApplicationCatalog", catalogPath, deploymentPath)
     }
 
   /**

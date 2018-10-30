@@ -102,19 +102,19 @@ class ClientTest extends WordSpec with Matchers with ScalaFutures with MockitoSu
       val deploymentFile = new File("deployment")
       val response = emptyClientResponse
 
-      when(client.javaClient.updateApplicationCatalog(catalogFile, deploymentFile))
+      when(client.javaClient.callProcedure("@UpdateApplicationCatalog", catalogFile, deploymentFile))
         .thenReturn(response)
 
-      client.updateApplicationCatalog(catalogFile, deploymentFile) shouldBe response
-      verify(client.javaClient).updateApplicationCatalog(catalogFile, deploymentFile)
+      client.callProcedure("@UpdateApplicationCatalog", catalogFile, deploymentFile) shouldBe response
+      verify(client.javaClient).callProcedure("@UpdateApplicationCatalog", catalogFile, deploymentFile)
     }
 
     "respond to #updateApplicationCatalogAsync" in {
-      val catalogFile = new File("jarfile")
-      val deploymentFile = new File("deployment")
+      val catalogFile = "jarfile"
+      val deploymentFile = "deployment"
       val response = emptyClientResponse
       val client = newClient(new TestClient {
-        override def updateApplicationCatalog(cb: ProcedureCallback, cp: File, dp: File) = {
+        override def callProcedure(cb: ProcedureCallback, procedureName: String, parameters: AnyRef*) = {
           cb.clientCallback(response)
           true
         }
@@ -124,8 +124,8 @@ class ClientTest extends WordSpec with Matchers with ScalaFutures with MockitoSu
     }
 
     "return a Future wrapping a ProcedureNotQueuedException when calling #updateApplicationCatalogAsync was not queued" in {
-      val catalogFile = new File("jarfile")
-      val deploymentFile = new File("deployment")
+      val catalogFile = "jarfile"
+      val deploymentFile = "deployment"
       val client = newClient()
 
       whenReady(client.updateApplicationCatalogAsync(catalogFile, deploymentFile).failed) { e ⇒
