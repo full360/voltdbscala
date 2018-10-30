@@ -39,6 +39,8 @@ trait TestClient extends Client {
 
   override def getNewBulkLoader(tableName: String, maxBatchSize: Int, blfcb: BulkLoaderFailureCallBack): VoltBulkLoader = ???
 
+  override def getNewBulkLoader(tableName: String, maxBatchSize: Int, upsertMode: Boolean, failureCallback: BulkLoaderFailureCallBack, successCallback: BulkLoaderSuccessCallback): VoltBulkLoader = ???
+
   override def calculateInvocationSerializedSize(procName: String, parameters: AnyRef*): Int = ???
 
   override def backpressureBarrier(): Unit = ???
@@ -54,6 +56,10 @@ trait TestClient extends Client {
   override def close(): Unit = ???
 
   override def getConnectedHostList: List[InetSocketAddress] = ???
+
+  override def isAutoReconnectEnabled: Boolean = ???
+
+  override def writeSummaryCSV(statsRowName: String, stats: ClientStats, path: String): Unit = ???
 
   override def writeSummaryCSV(stats: ClientStats, path: String): Unit = ???
 

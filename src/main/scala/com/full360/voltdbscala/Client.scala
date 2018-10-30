@@ -131,12 +131,12 @@ trait Client {
    * @param maxBatchSize Batch size to collect for the table before pushing a bulk insert.
    * @param upsert       set to true if want upsert instead of insert
    * @param f            Function invoked by the BulkLoaderFailureCallBack used for notification of failed inserts.
+   * @param f2           Function invoked by BulkLoaderSuccessCallback used for notifications on successful load operations
    * @return instance of VoltBulkLoader
    * @throws Exception if tableName can't be found in the catalog.
    */
-  def getNewBulkLoader(tableName: String, maxBatchSize: Int, upsert: Boolean = false)(f: (Any, Seq[AnyRef], ClientResponse) ⇒ Unit): VoltBulkLoader =
-    javaClient.getNewBulkLoader(tableName, maxBatchSize, upsert, bulkLoaderFailureCallBack(f))
-
+  def getNewBulkLoader(tableName: String, maxBatchSize: Int, upsert: Boolean = false)(f: (Any, Seq[AnyRef], ClientResponse) ⇒ Unit)(f2: (Any, ClientResponse) ⇒ Unit): VoltBulkLoader =
+    javaClient.getNewBulkLoader(tableName, maxBatchSize, upsert, bulkLoaderFailureCallBack(f), bulkLoaderSuccessCallBack(f2))
   /**
    * The method uses system procedure <strong>@GetPartitionKeys</strong> to get a set of partition
    * values and then execute the stored procedure one partition at a time, and return an
@@ -211,6 +211,70 @@ trait Client {
       val cb = procedureCallback(promise.success(_))
       javaClient.callProcedureWithTimeout(cb, queryTimeout, procName, paramsToJavaObjects(parameters: _*): _*)
     }
+
+  /**
+   * <p>Tell whether Client has turned on the auto-reconnect feature. If it is on,
+   * Client would pause instead of stop when all connections to the server are lost,
+   * and would resume after the connection is restored.
+   *
+   * @return true if the client wants to use auto-reconnect feature.</p>
+   */
+  def isAutoReconnectEnabled: Boolean = javaClient.isAutoReconnectEnabled
+
+  /**
+   * <p>Write a single line of comma separated values to the file specified.
+   * Used mainly for collecting results from benchmarks.</p>
+   *
+   * <p>The format of this output is subject to change between versions</p>
+   *
+   * <p>Format:
+   * <ol>
+   * <li>Timestamp (ms) of creation of the given {@link ClientStats} instance, stats.</li>
+   * <li>Duration from first procedure call within the given {@link ClientStats} instance
+   * until this call in ms.</li>
+   * <li>1-percentile round trip latency estimate in ms.</li>
+   * <li>Max measure round trip latency in ms.</li>
+   * <li>95-percentile round trip latency estimate in ms.</li>
+   * <li>99-percentile round trip latency estimate in ms.</li>
+   * <li>99.9-percentile round trip latency estimate in ms.</li>
+   * <li>99.99-percentile round trip latency estimate in ms.</li>
+   * <li>99.999-percentile round trip latency estimate in ms.</li>
+   * </ol>
+   *
+   * @param stats { @link ClientStats} instance with relevant stats.
+   * @param path Path to write to, passed to { @link FileWriter#FileWriter(String)}.
+   */
+  def writeSummaryCSV(stats: ClientStats, path: String): Unit = {
+    javaClient.writeSummaryCSV(stats, path)
+  }
+
+  /**
+   * <p>Write a single line of comma separated values to the file specified.
+   * Used mainly for collecting results from benchmarks.</p>
+   *
+   * <p>The format of this output is subject to change between versions</p>
+   *
+   * <p>Format:
+   * <ol>
+   * <li>Timestamp (ms) of creation of the given {@link ClientStats} instance, stats.</li>
+   * <li>Duration from first procedure call within the given {@link ClientStats} instance
+   * until this call in ms.</li>
+   * <li>1-percentile round trip latency estimate in ms.</li>
+   * <li>Max measure round trip latency in ms.</li>
+   * <li>95-percentile round trip latency estimate in ms.</li>
+   * <li>99-percentile round trip latency estimate in ms.</li>
+   * <li>99.9-percentile round trip latency estimate in ms.</li>
+   * <li>99.99-percentile round trip latency estimate in ms.</li>
+   * <li>99.999-percentile round trip latency estimate in ms.</li>
+   * </ol>
+   *
+   * @param statsRowName give the client stats row an identifiable name.
+   * @param stats        { @link ClientStats} instance with relevant stats.
+   * @param path Path to write to, passed to { @link FileWriter#FileWriter(String)}.
+   */
+  def writeSummaryCSV(statsRowName: String, stats: ClientStats, path: String): Unit = {
+    javaClient.writeSummaryCSV(statsRowName, stats, path)
+  }
 
   /**
    * Helper method to simplify async proc calls

@@ -9,7 +9,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Matchers, WordSpec}
 import org.voltdb.VoltTable
-import org.voltdb.client.VoltBulkLoader.BulkLoaderFailureCallBack
+import org.voltdb.client.VoltBulkLoader.{BulkLoaderFailureCallBack, BulkLoaderSuccessCallback}
 import org.voltdb.client._
 
 import scala.concurrent.ExecutionContext
@@ -138,12 +138,13 @@ class ClientTest extends WordSpec with Matchers with ScalaFutures with MockitoSu
 
       val client = newClient()
       val f = (p1: Any, p2: Seq[AnyRef], p3: ClientResponse) ⇒ ()
+      val f2 = (p1: Any, p3: ClientResponse) ⇒ ()
 
-      client.getNewBulkLoader("table", 123, upsert = true)(f)
-      verify(client.javaClient).getNewBulkLoader(m.eq("table"), m.eq(123), m.eq(true), m.any[BulkLoaderFailureCallBack]())
+      client.getNewBulkLoader("table", 123, upsert = true)(f)(f2)
+      verify(client.javaClient).getNewBulkLoader(m.eq("table"), m.eq(123), m.eq(true), m.any[BulkLoaderFailureCallBack](), m.any[BulkLoaderSuccessCallback])
 
-      client.getNewBulkLoader("table", 123)(f)
-      verify(client.javaClient).getNewBulkLoader(m.eq("table"), m.eq(123), m.eq(false), m.any[BulkLoaderFailureCallBack]())
+      client.getNewBulkLoader("table", 123)(f)(f2)
+      verify(client.javaClient).getNewBulkLoader(m.eq("table"), m.eq(123), m.eq(false), m.any[BulkLoaderFailureCallBack](), m.any[BulkLoaderSuccessCallback])
     }
 
     "respond to #callAllPartitionProcedure" in {
@@ -216,6 +217,30 @@ class ClientTest extends WordSpec with Matchers with ScalaFutures with MockitoSu
       whenReady(client.callProcedureWithTimeoutAsync(123, "proc", 123, "arg").failed) { e ⇒
         e shouldBe a[ProcedureNotQueuedException]
       }
+    }
+
+    "respond to #isAutoReconnectEnabled" in {
+      val client = newClient(new TestClient {
+        override def isAutoReconnectEnabled: Boolean = true
+      })
+
+      client.javaClient.isAutoReconnectEnabled shouldBe true
+    }
+
+    "respond to #WriteSummaryCSV" in {
+      val client = newClient()
+      val stats = mock[ClientStats]
+      val path = "path"
+      val row = "rowName"
+
+      doNothing().when(client.javaClient).writeSummaryCSV(stats, path)
+      doNothing().when(client.javaClient).writeSummaryCSV(row, stats, path)
+
+      client.javaClient.writeSummaryCSV(stats, path)
+      client.javaClient.writeSummaryCSV(row, stats, path)
+
+      verify(client.javaClient).writeSummaryCSV(stats, path)
+      verify(client.javaClient).writeSummaryCSV(row, stats, path)
     }
   }
 }

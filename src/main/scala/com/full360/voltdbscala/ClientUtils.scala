@@ -1,6 +1,6 @@
 package com.full360.voltdbscala
 
-import org.voltdb.client.VoltBulkLoader.BulkLoaderFailureCallBack
+import org.voltdb.client.VoltBulkLoader.{BulkLoaderFailureCallBack, BulkLoaderSuccessCallback}
 import org.voltdb.client.{AllPartitionProcedureCallback, ClientResponse, ClientResponseWithPartitionKey, ProcedureCallback, Client ⇒ JavaClient}
 
 object ClientUtils {
@@ -41,6 +41,10 @@ object ClientUtils {
 
   def bulkLoaderFailureCallBack(f: (Any, Seq[AnyRef], ClientResponse) ⇒ Unit): BulkLoaderFailureCallBack = new BulkLoaderFailureCallBack {
     override def failureCallback(rowHandle: Any, fieldList: Array[AnyRef], response: ClientResponse): Unit = f(rowHandle, fieldList.toList, response)
+  }
+
+  def bulkLoaderSuccessCallBack(f: (Any, ClientResponse) ⇒ Unit): BulkLoaderSuccessCallback = new BulkLoaderSuccessCallback {
+    override def success(rowHandle: scala.Any, response: ClientResponse): Unit = f(rowHandle, response)
   }
 
   def allPartitionProcedureCallback(cb: Seq[ClientResponseWithPartitionKey] ⇒ Unit): AllPartitionProcedureCallback = new AllPartitionProcedureCallback {
