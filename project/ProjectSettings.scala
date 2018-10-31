@@ -59,6 +59,7 @@ object ProjectSettings {
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
     "-Xfuture",
+    "-Xlint:-unused",
     "-Ywarn-unused-import"
   )
 
