@@ -286,7 +286,7 @@ trait Client {
    * @tparam T Type of the resulting Future
    * @return a scala Future
    */
-  protected def handleAsyncProcCall[T](f: Promise[T] ⇒ Boolean)(implicit ec: ExecutionContext): Future[T] = {
+  protected def handleAsyncProcCall[T](f: Promise[T] ⇒ Boolean): Future[T] = {
     val promise = Promise[T]()
     val future = promise.future
     val isQueued = f(promise)
