@@ -97,7 +97,7 @@ trait Client {
    * @param classesToDelete comma-separated list of classes to delete.  May be null.
    * @return an instance of a [[org.voltdb.client.ClientResponse ClientResponse]] or exception.
    */
-  def updateClasses(jarPath: File, classesToDelete: String)(implicit ec: ExecutionContext): ClientResponse =
+  def updateClasses(jarPath: File, classesToDelete: String): ClientResponse =
     javaClient.updateClasses(jarPath, classesToDelete)
 
   /**
