@@ -108,6 +108,12 @@ class ClientTest extends WordSpec with Matchers with ScalaFutures with MockitoSu
 
       client.getNewBulkLoader("table", 123)(f)(f2)
       verify(client.javaClient).getNewBulkLoader(m.eq("table"), m.eq(123), m.eq(false), m.any[BulkLoaderFailureCallBack](), m.any[BulkLoaderSuccessCallback])
+
+      client.getNewBulkLoader("table", 123, upsert = true)(f)(_)
+      verify(client.javaClient).getNewBulkLoader(m.eq("table"), m.eq(123), m.eq(true), m.any[BulkLoaderFailureCallBack](), m.any[BulkLoaderSuccessCallback])
+
+      client.getNewBulkLoader("table", 123)(f)(_)
+      verify(client.javaClient).getNewBulkLoader(m.eq("table"), m.eq(123), m.eq(false), m.any[BulkLoaderFailureCallBack](), m.any[BulkLoaderSuccessCallback])
     }
 
     "respond to #callAllPartitionProcedure" in {
