@@ -66,7 +66,7 @@ class ClientTest extends WordSpec with Matchers with ScalaFutures with MockitoSu
       val file = new File("jarfile")
       val response = emptyClientResponse
 
-      when(client.javaClient.updateClasses(file, "deleteClasses"))
+      when(client.updateClasses(file, "deleteClasses"))
         .thenReturn(response)
 
       client.updateClasses(file, "deleteClasses") shouldBe response
@@ -92,43 +92,6 @@ class ClientTest extends WordSpec with Matchers with ScalaFutures with MockitoSu
       })
 
       whenReady(client.updateClassesAsync(file, "deleteClasses").failed) { e ⇒
-        e shouldBe a[ProcedureNotQueuedException]
-      }
-    }
-
-    "respond to #updateApplicationCatalog" in {
-      val client = newClient()
-      val catalogFile = new File("jarfile")
-      val deploymentFile = new File("deployment")
-      val response = emptyClientResponse
-
-      when(client.javaClient.callProcedure("@UpdateApplicationCatalog", catalogFile, deploymentFile))
-        .thenReturn(response)
-
-      client.callProcedure("@UpdateApplicationCatalog", catalogFile, deploymentFile) shouldBe response
-      verify(client.javaClient).callProcedure("@UpdateApplicationCatalog", catalogFile, deploymentFile)
-    }
-
-    "respond to #updateApplicationCatalogAsync" in {
-      val catalogFile = "jarfile"
-      val deploymentFile = "deployment"
-      val response = emptyClientResponse
-      val client = newClient(new TestClient {
-        override def callProcedure(cb: ProcedureCallback, procedureName: String, parameters: AnyRef*) = {
-          cb.clientCallback(response)
-          true
-        }
-      })
-
-      whenReady(client.updateApplicationCatalogAsync(catalogFile, deploymentFile)) { result ⇒ result shouldBe response }
-    }
-
-    "return a Future wrapping a ProcedureNotQueuedException when calling #updateApplicationCatalogAsync was not queued" in {
-      val catalogFile = "jarfile"
-      val deploymentFile = "deployment"
-      val client = newClient()
-
-      whenReady(client.updateApplicationCatalogAsync(catalogFile, deploymentFile).failed) { e ⇒
         e shouldBe a[ProcedureNotQueuedException]
       }
     }

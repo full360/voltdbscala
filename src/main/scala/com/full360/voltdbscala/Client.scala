@@ -79,6 +79,28 @@ trait Client {
     }
 
   /**
+   * <p>invokes UpdateClasses procedure. Does not
+   * guarantee that the invocation is actually queued. If there is
+   * backpressure on all connections to the cluster then the invocation will
+   * not be queued. The resulting Future will contain a
+   * [[com.full360.voltdbscala.ProcedureNotQueuedException ProcCallException]] if queueing did not take place.</p>
+   *
+   * <p>This method is a convenience method that is equivalent to reading a jarfile containing
+   * to be added/updated into a byte array in Java code, then calling
+   * [[org.voltdb.client.Client#callProcedure(String, Object...) Client.callProcedure]]
+   * with "@UpdateClasses" as the procedure name, followed by the bytes of the jarfile
+   * and a string containing a comma-separates list of classes to delete from the catalog.</p>
+   *
+   * @see [[org.voltdb.client.Client#updateClasses(java.io.File, String) Client.updateClasses]]
+   *
+   * @param jarPath path to the jar file containing new/updated classes.  May be null.
+   * @param classesToDelete comma-separated list of classes to delete.  May be null.
+   * @return an instance of a [[org.voltdb.client.ClientResponse ClientResponse]] or exception.
+   */
+  def updateClasses(jarPath: File, classesToDelete: String)(implicit ec: ExecutionContext): ClientResponse =
+    javaClient.updateClasses(jarPath, classesToDelete)
+
+  /**
    * <p>Asynchronously invokes UpdateClasses procedure. Does not
    * guarantee that the invocation is actually queued. If there is
    * backpressure on all connections to the cluster then the invocation will
@@ -102,24 +124,6 @@ trait Client {
       val cb = procedureCallback(promise.success(_))
       javaClient.updateClasses(cb, jarPath, classesToDelete)
     }
-
-  /**
-   * <p>Asynchronously invokes UpdateApplicationCatalog procedure. Does not
-   * guarantee that the invocation is actually queued. If there is
-   * backpressure on all connections to the cluster then the invocation will
-   * not be queued. The resulting Future will contain a
-   * [[com.full360.voltdbscala.ProcedureNotQueuedException ProcCallException]] if queueing did not take place.</p>
-   *
-   * @param catalogPath    Path to the catalog jar file.
-   * @param deploymentPath Path to the deployment file.
-   * @return a scala Future holding an instance of a [[org.voltdb.client.ClientResponse ClientResponse]] or exception.
-   */
-  def updateApplicationCatalogAsync(catalogPath: String, deploymentPath: String)(implicit ec: ExecutionContext): Future[ClientResponse] =
-    handleAsyncProcCall[ClientResponse] { promise ⇒
-      val cb = procedureCallback(promise.success(_))
-      javaClient.callProcedure(cb, "@UpdateApplicationCatalog", catalogPath, deploymentPath)
-    }
-
   /**
    * <p>Creates a new instance of a VoltBulkLoader that is bound to this Client.
    * Multiple instances of a VoltBulkLoader created by a single Client will share some
