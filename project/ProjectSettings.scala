@@ -11,7 +11,7 @@ object ProjectSettings {
 
     organization := "com.full360",
 
-    version := "0.5.0-SNAPSHOT",
+    version := "0.8.0-SNAPSHOT",
 
     scalaVersion := "2.11.12",
 
@@ -40,7 +40,7 @@ object ProjectSettings {
   ) ++ formatSettings
 
   lazy val libraryDependencies_ = Seq(
-    "org.voltdb"              % "voltdbclient"   % "6.8" % "provided",
+    "org.voltdb"              % "voltdbclient"   % "8.3" % "provided",
     "org.scalatest"          %% "scalatest"      % "3.0.0" % "test",
     "org.mockito"             % "mockito-all"    % "1.9.5" % "test"
   )

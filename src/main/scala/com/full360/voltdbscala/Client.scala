@@ -79,6 +79,28 @@ trait Client {
     }
 
   /**
+   * <p>invokes UpdateClasses procedure. Does not
+   * guarantee that the invocation is actually queued. If there is
+   * backpressure on all connections to the cluster then the invocation will
+   * not be queued. The resulting Future will contain a
+   * [[com.full360.voltdbscala.ProcedureNotQueuedException ProcCallException]] if queueing did not take place.</p>
+   *
+   * <p>This method is a convenience method that is equivalent to reading a jarfile containing
+   * to be added/updated into a byte array in Java code, then calling
+   * [[org.voltdb.client.Client#callProcedure(String, Object...) Client.callProcedure]]
+   * with "@UpdateClasses" as the procedure name, followed by the bytes of the jarfile
+   * and a string containing a comma-separates list of classes to delete from the catalog.</p>
+   *
+   * @see [[org.voltdb.client.Client#updateClasses(java.io.File, String) Client.updateClasses]]
+   *
+   * @param jarPath path to the jar file containing new/updated classes.  May be null.
+   * @param classesToDelete comma-separated list of classes to delete.  May be null.
+   * @return an instance of a [[org.voltdb.client.ClientResponse ClientResponse]] or exception.
+   */
+  def updateClasses(jarPath: File, classesToDelete: String): ClientResponse =
+    javaClient.updateClasses(jarPath, classesToDelete)
+
+  /**
    * <p>Asynchronously invokes UpdateClasses procedure. Does not
    * guarantee that the invocation is actually queued. If there is
    * backpressure on all connections to the cluster then the invocation will
@@ -102,26 +124,6 @@ trait Client {
       val cb = procedureCallback(promise.success(_))
       javaClient.updateClasses(cb, jarPath, classesToDelete)
     }
-
-  /**
-   * <p>Asynchronously invokes UpdateApplicationCatalog procedure. Does not
-   * guarantee that the invocation is actually queued. If there is
-   * backpressure on all connections to the cluster then the invocation will
-   * not be queued. The resulting Future will contain a
-   * [[com.full360.voltdbscala.ProcedureNotQueuedException ProcCallException]] if queueing did not take place.</p>
-   *
-   * @see [[org.voltdb.client.Client#updateApplicationCatalog(org.voltdb.client.ProcedureCallback, java.io.File, java.io.File) Client.updateApplicationCatalog]]
-   *
-   * @param catalogPath    Path to the catalog jar file.
-   * @param deploymentPath Path to the deployment file.
-   * @return a scala Future holding an instance of a [[org.voltdb.client.ClientResponse ClientResponse]] or exception.
-   */
-  def updateApplicationCatalogAsync(catalogPath: File, deploymentPath: File)(implicit ec: ExecutionContext): Future[ClientResponse] =
-    handleAsyncProcCall[ClientResponse] { promise ⇒
-      val cb = procedureCallback(promise.success(_))
-      javaClient.updateApplicationCatalog(cb, catalogPath, deploymentPath)
-    }
-
   /**
    * <p>Creates a new instance of a VoltBulkLoader that is bound to this Client.
    * Multiple instances of a VoltBulkLoader created by a single Client will share some
@@ -133,12 +135,12 @@ trait Client {
    * @param maxBatchSize Batch size to collect for the table before pushing a bulk insert.
    * @param upsert       set to true if want upsert instead of insert
    * @param f            Function invoked by the BulkLoaderFailureCallBack used for notification of failed inserts.
+   * @param f2           Function invoked by BulkLoaderSuccessCallback used for notifications on successful load operations
    * @return instance of VoltBulkLoader
    * @throws Exception if tableName can't be found in the catalog.
    */
-  def getNewBulkLoader(tableName: String, maxBatchSize: Int, upsert: Boolean = false)(f: (Any, Seq[AnyRef], ClientResponse) ⇒ Unit): VoltBulkLoader =
-    javaClient.getNewBulkLoader(tableName, maxBatchSize, upsert, bulkLoaderFailureCallBack(f))
-
+  def getNewBulkLoader(tableName: String, maxBatchSize: Int, upsert: Boolean = false)(f: (Any, Seq[AnyRef], ClientResponse) ⇒ Unit)(f2: (Any, ClientResponse) ⇒ Unit): VoltBulkLoader =
+    javaClient.getNewBulkLoader(tableName, maxBatchSize, upsert, bulkLoaderFailureCallBack(f), bulkLoaderSuccessCallBack(f2))
   /**
    * The method uses system procedure <strong>@GetPartitionKeys</strong> to get a set of partition
    * values and then execute the stored procedure one partition at a time, and return an
@@ -213,6 +215,70 @@ trait Client {
       val cb = procedureCallback(promise.success(_))
       javaClient.callProcedureWithTimeout(cb, queryTimeout, procName, paramsToJavaObjects(parameters: _*): _*)
     }
+
+  /**
+   * <p>Tell whether Client has turned on the auto-reconnect feature. If it is on,
+   * Client would pause instead of stop when all connections to the server are lost,
+   * and would resume after the connection is restored.
+   *
+   * @return true if the client wants to use auto-reconnect feature.</p>
+   */
+  def isAutoReconnectEnabled: Boolean = javaClient.isAutoReconnectEnabled
+
+  /**
+   * <p>Write a single line of comma separated values to the file specified.
+   * Used mainly for collecting results from benchmarks.</p>
+   *
+   * <p>The format of this output is subject to change between versions</p>
+   *
+   * <p>Format:
+   * <ol>
+   * <li>Timestamp (ms) of creation of the given {@link ClientStats} instance, stats.</li>
+   * <li>Duration from first procedure call within the given {@link ClientStats} instance
+   * until this call in ms.</li>
+   * <li>1-percentile round trip latency estimate in ms.</li>
+   * <li>Max measure round trip latency in ms.</li>
+   * <li>95-percentile round trip latency estimate in ms.</li>
+   * <li>99-percentile round trip latency estimate in ms.</li>
+   * <li>99.9-percentile round trip latency estimate in ms.</li>
+   * <li>99.99-percentile round trip latency estimate in ms.</li>
+   * <li>99.999-percentile round trip latency estimate in ms.</li>
+   * </ol>
+   *
+   * @param stats { @link ClientStats} instance with relevant stats.
+   * @param path Path to write to, passed to { @link FileWriter#FileWriter(String)}.
+   */
+  def writeSummaryCSV(stats: ClientStats, path: String): Unit = {
+    javaClient.writeSummaryCSV(stats, path)
+  }
+
+  /**
+   * <p>Write a single line of comma separated values to the file specified.
+   * Used mainly for collecting results from benchmarks.</p>
+   *
+   * <p>The format of this output is subject to change between versions</p>
+   *
+   * <p>Format:
+   * <ol>
+   * <li>Timestamp (ms) of creation of the given {@link ClientStats} instance, stats.</li>
+   * <li>Duration from first procedure call within the given {@link ClientStats} instance
+   * until this call in ms.</li>
+   * <li>1-percentile round trip latency estimate in ms.</li>
+   * <li>Max measure round trip latency in ms.</li>
+   * <li>95-percentile round trip latency estimate in ms.</li>
+   * <li>99-percentile round trip latency estimate in ms.</li>
+   * <li>99.9-percentile round trip latency estimate in ms.</li>
+   * <li>99.99-percentile round trip latency estimate in ms.</li>
+   * <li>99.999-percentile round trip latency estimate in ms.</li>
+   * </ol>
+   *
+   * @param statsRowName give the client stats row an identifiable name.
+   * @param stats        { @link ClientStats} instance with relevant stats.
+   * @param path Path to write to, passed to { @link FileWriter#FileWriter(String)}.
+   */
+  def writeSummaryCSV(statsRowName: String, stats: ClientStats, path: String): Unit = {
+    javaClient.writeSummaryCSV(statsRowName, stats, path)
+  }
 
   /**
    * Helper method to simplify async proc calls
