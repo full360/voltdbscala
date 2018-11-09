@@ -7,9 +7,9 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 import org.voltdb.VoltTable
-import org.voltdb.client.VoltBulkLoader.{BulkLoaderFailureCallBack, BulkLoaderSuccessCallback}
+import org.voltdb.client.VoltBulkLoader.{ BulkLoaderFailureCallBack, BulkLoaderSuccessCallback }
 import org.voltdb.client._
 
 import scala.concurrent.ExecutionContext
@@ -97,7 +97,7 @@ class ClientTest extends WordSpec with Matchers with ScalaFutures with MockitoSu
     }
 
     "respond to #getNewBulkLoader" in {
-      import org.mockito.{Matchers ⇒ m}
+      import org.mockito.{ Matchers ⇒ m }
 
       val client = newClient()
       val f = (p1: Any, p2: Seq[AnyRef], p3: ClientResponse) ⇒ ()
@@ -128,7 +128,7 @@ class ClientTest extends WordSpec with Matchers with ScalaFutures with MockitoSu
     }
 
     "respond to #callAllPartitionProcedureAsync" in {
-      import org.mockito.{Matchers ⇒ m}
+      import org.mockito.{ Matchers ⇒ m }
 
       val client = newClient()
 

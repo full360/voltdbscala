@@ -1,7 +1,7 @@
 package com.full360.voltdbscala
 
-import org.voltdb.client.VoltBulkLoader.{BulkLoaderFailureCallBack, BulkLoaderSuccessCallback}
-import org.voltdb.client.{AllPartitionProcedureCallback, ClientResponse, ClientResponseWithPartitionKey, ProcedureCallback, Client ⇒ JavaClient}
+import org.voltdb.client.VoltBulkLoader.{ BulkLoaderFailureCallBack, BulkLoaderSuccessCallback }
+import org.voltdb.client.{ AllPartitionProcedureCallback, ClientResponse, ClientResponseWithPartitionKey, ProcedureCallback, Client ⇒ JavaClient }
 
 object ClientUtils {
 

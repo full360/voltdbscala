@@ -1,6 +1,6 @@
 package com.full360.voltdbscala.util
 
-import org.voltdb.{VoltTable, VoltType}
+import org.voltdb.{ VoltTable, VoltType }
 
 import scala.annotation.tailrec
 

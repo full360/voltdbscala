@@ -23,19 +23,7 @@ object ProjectSettings {
 
     scalacOptions in (Compile, doc) ++= Seq("-no-link-warnings"),
 
-    pomExtra := pomExtra_,
-
-    parallelExecution in Test := false,
-
-    credentials += Credentials(
-      "Sonatype Nexus Repository Manager",
-      "oss.sonatype.org",
-      sys.env.getOrElse("SONATYPE_USERNAME", ""),
-      sys.env.getOrElse("SONATYPE_PASSWORD", "")),
-
-    pgpSecretRing := file(".secring.gpg"),
-    pgpPublicRing := file(".pubring.gpg"),
-    pgpPassphrase := sys.env.get("SONATYPE_KEY_PASSPHRASE").map(_.toArray)
+    parallelExecution in Test := false
 
   ) ++ formatSettings
 
@@ -76,25 +64,4 @@ object ProjectSettings {
     ScalariformKeys.preferences in Compile := formattingPreferences,
     ScalariformKeys.preferences in Test    := formattingPreferences
   )
-
-  lazy val pomExtra_ = {
-    <url>https://github.com/full360/voltdbscala</url>
-    <licenses>
-      <license>
-        <name>MIT</name>
-        <url>http://opensource.org/licenses/MIT</url>
-      </license>
-    </licenses>
-    <scm>
-      <connection>scm:git:github.com/full360/voltdbscala.git</connection>
-      <developerConnection>scm:git:git@github.com:full360/voltdbscala.git</developerConnection>
-      <url>github.com/full360/voltdbscala.git</url>
-    </scm>
-    <developers>
-      <developer>
-        <id>diorman</id>
-        <name>Diorman Colmenares</name>
-      </developer>
-    </developers>
-  }
 }
