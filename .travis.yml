@@ -1,11 +1,7 @@
 language: scala
 
 jdk:
-   - oraclejdk8
-
-scala:
-   - 2.11.12
-   - 2.12.6
+  - openjdk8
 
 stages:
   - test
@@ -14,6 +10,9 @@ stages:
 jobs:
   include:
     - stage: test
+      scala:
+        - 2.11.12
+        - 2.12.6
       script: sbt ++$TRAVIS_SCALA_VERSION compile test
     - stage: publish
       scala: 2.12.6
@@ -33,9 +32,6 @@ cache:
 before_install:
   - openssl aes-256-cbc -k "$ENC_PASSWORD" -in .secring.gpg.enc -out .secring.gpg -d
   - openssl aes-256-cbc -k "$ENC_PASSWORD" -in .pubring.gpg.enc -out .pubring.gpg -d
-
-script:
-  - project/travis.sh
 
 notifications:
   email:
