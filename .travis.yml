@@ -3,6 +3,7 @@ language: scala
 stages:
   - test
   - publish
+  - release
 
 jdk:
   - openjdk8
@@ -12,13 +13,16 @@ scala:
   - 2.12.6
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION compile test
+  - project/voltdbscala test
+  - 
 
 jobs:
   include:
     - stage: publish
+      script: project/voltdbscala publish
+    - stage: release
       scala: 2.12.6
-      script: project/publish.sh
+      script: project/voltdbscala release
 
 before_cache:
   # Tricks to avoid unnecessary cache updates

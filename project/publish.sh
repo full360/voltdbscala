@@ -10,9 +10,42 @@ echo "TRAVIS_PULL_REQUEST_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH"
 echo "TRAVIS_SCALA_VERSION=$TRAVIS_SCALA_VERSION"
 
 # Commands
-if [ "$TRAVIS_BRANCH" = "$TRAVIS_TAG" ]; then
-  echo "Publishing release: $TRAVIS_TAG to sonatype"
-  sbt + publishSigned && sbt + sonatypeReleaseAll
-else
-  echo "Nothing to publishing to sonatype"
-fi
+function compile_test {
+  sbt ++$TRAVIS_SCALA_VERSION compile test
+}
+
+function publish {
+  if [ "$TRAVIS_BRANCH" = "$TRAVIS_TAG" ]; then
+    echo "Publishing $TRAVIS_TAG to sonatype"
+    sbt ++$TRAVIS_SCALA_VERSION publishSigned
+  else
+    echo "Nothing to publishing to sonatype"
+  fi
+}
+
+function release {
+  if [ "$TRAVIS_BRANCH" = "$TRAVIS_TAG" ]; then
+    echo "Releasing $TRAVIS_TAG to sonatype"
+    sbt sonatypeReleaseAll
+  else
+    echo "Nothing to release to sonatype"
+  fi
+}
+
+case "$1" in
+  test)
+    compile_test
+    ;;
+
+  publish)
+    publish
+    ;;
+
+  release)
+    release
+    ;;
+
+  *)
+    echo $"Usage: $0 {test|publish|release}"
+    exit 1
+esac
