@@ -11,7 +11,7 @@ object ProjectSettings {
 
     organization := "com.full360",
 
-    version := "0.8.0.7",
+    version := "0.8.0.8",
 
     scalaVersion := "2.11.12",
 
