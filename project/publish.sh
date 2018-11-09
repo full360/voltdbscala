@@ -12,7 +12,7 @@ echo "TRAVIS_SCALA_VERSION=$TRAVIS_SCALA_VERSION"
 # Commands
 if [ "$TRAVIS_BRANCH" = "$TRAVIS_TAG" ]; then
   echo "Publishing release: $TRAVIS_TAG to sonatype"
-  sbt publishSigned && sbt sonatypeReleaseAll
+  sbt + publishSigned && sbt + sonatypeReleaseAll
 else
   echo "Nothing to publishing to sonatype"
 fi
