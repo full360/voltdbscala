@@ -1,9 +1,9 @@
 package com.full360.voltdbscala
 
 import com.full360.voltdbscala.util.VoltTableBuilder
-import org.scalatest.{Matchers, WordSpec}
-import org.voltdb.{VoltTable, VoltTableRow, VoltType}
-import org.voltdb.client.{ClientResponse, TestClientResponse}
+import org.scalatest.{ Matchers, WordSpec }
+import org.voltdb.{ VoltTable, VoltTableRow, VoltType }
+import org.voltdb.client.{ ClientResponse, TestClientResponse }
 
 class ClientResponseUtilsTest extends WordSpec with Matchers {
   case class TestObj(col1: String, col2: String)
@@ -24,8 +24,7 @@ class ClientResponseUtilsTest extends WordSpec with Matchers {
     result shouldBe Seq(
       TestObj("r1:c1", "r1:c2"),
       TestObj("r2:c1", "r2:c2"),
-      TestObj("r3:c1", "r3:c2")
-    )
+      TestObj("r3:c1", "r3:c2"))
   }
 
   "ClientResponseUtils.mapClientResponseResult throws a ClientResponseStatusException if client response is not valid" in {

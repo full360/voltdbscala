@@ -1,6 +1,6 @@
 package com.full360.voltdbscala
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 
 class ClientUtilsTest extends WordSpec with Matchers {
   "ClientUtils.paramsToJavaObjects maps parameters from Any to AnyRef(java Object)" in {

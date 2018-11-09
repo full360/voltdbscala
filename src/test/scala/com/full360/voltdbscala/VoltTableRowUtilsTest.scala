@@ -1,8 +1,8 @@
 package com.full360.voltdbscala
 
 import com.full360.voltdbscala.util.VoltTableBuilder
-import org.scalatest.{Matchers, WordSpec}
-import org.voltdb.{VoltTable, VoltType}
+import org.scalatest.{ Matchers, WordSpec }
+import org.voltdb.{ VoltTable, VoltType }
 
 class VoltTableRowUtilsTest extends WordSpec with Matchers {
 

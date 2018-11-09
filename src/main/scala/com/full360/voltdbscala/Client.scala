@@ -2,8 +2,8 @@ package com.full360.voltdbscala
 
 import java.io.File
 
-import scala.concurrent.{ExecutionContext, Future, Promise}
-import org.voltdb.{client ⇒ jclient}
+import scala.concurrent.{ ExecutionContext, Future, Promise }
+import org.voltdb.{ client ⇒ jclient }
 import org.voltdb.client.VoltBulkLoader.VoltBulkLoader
 import jclient._
 

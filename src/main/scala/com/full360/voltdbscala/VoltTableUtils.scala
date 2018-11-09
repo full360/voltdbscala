@@ -1,6 +1,6 @@
 package com.full360.voltdbscala
 
-import org.voltdb.{VoltTable, VoltTableRow}
+import org.voltdb.{ VoltTable, VoltTableRow }
 
 object VoltTableUtils {
 
