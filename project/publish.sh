@@ -9,15 +9,10 @@ echo "TRAVIS_PULL_REQUEST=$TRAVIS_PULL_REQUEST"
 echo "TRAVIS_PULL_REQUEST_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH"
 echo "TRAVIS_SCALA_VERSION=$TRAVIS_SCALA_VERSION"
 
-function compile_test {
-  sbt ++$TRAVIS_SCALA_VERSION compile test
-}
-
 # Commands
 if [ "$TRAVIS_BRANCH" = "$TRAVIS_TAG" ]; then
-  compile_test \
-  && sbt ++$TRAVIS_SCALA_VERSION publishSigned \
-  && sbt ++$TRAVIS_SCALA_VERSION sonatypeReleaseAll
+  echo "Publishing release: $TRAVIS_TAG to sonatype"
+  sbt publishSigned && sbt sonatypeReleaseAll
 else
-  compile_test
+  echo "Nothing to publishing to sonatype"
 fi
