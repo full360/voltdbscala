@@ -14,7 +14,7 @@ function compile_test {
 }
 
 # Commands
-if [ "$TRAVIS_BRANCH" = "master"] && [ -n "$TRAVIS_TAG" ]; then
+if [ "$TRAVIS_BRANCH" = "master" ] && [ -n "$TRAVIS_TAG" ]; then
   compile_test \
   && sbt ++$TRAVIS_SCALA_VERSION publishSigned \
   && sbt ++$TRAVIS_SCALA_VERSION sonatypeRelease
