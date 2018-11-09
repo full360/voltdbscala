@@ -11,10 +11,11 @@ scala:
   - 2.11.12
   - 2.12.6
 
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION compile test
+
 jobs:
   include:
-    - stage: test
-      script: sbt ++$TRAVIS_SCALA_VERSION compile test
     - stage: publish
       scala: 2.12.6
       script: project/publish.sh
