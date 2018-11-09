@@ -1,8 +1,8 @@
 import sbt._
-import com.typesafe.sbt.SbtScalariform
-import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import Keys._
 import com.typesafe.sbt.SbtPgp.autoImportImpl.{ pgpPassphrase, pgpPublicRing, pgpSecretRing }
+import scalariform.formatter.preferences._
+import com.typesafe.sbt.SbtScalariform.autoImport.scalariformPreferences
 
 object ProjectSettings {
 
@@ -23,9 +23,10 @@ object ProjectSettings {
 
     scalacOptions in (Compile, doc) ++= Seq("-no-link-warnings"),
 
-    parallelExecution in Test := false
+    parallelExecution in Test := false,
 
-  ) ++ formatSettings
+    formatSettings
+  )
 
   lazy val libraryDependencies_ = Seq(
     "org.voltdb"              % "voltdbclient"   % "8.3" % "provided",
@@ -51,17 +52,9 @@ object ProjectSettings {
     "-Ywarn-unused-import"
   )
 
-  def formattingPreferences = {
-    import scalariform.formatter.preferences._
-    FormattingPreferences()
+  val formatSettings = scalariformPreferences := scalariformPreferences.value
       .setPreference(RewriteArrowSymbols, true)
       .setPreference(AlignParameters, true)
       .setPreference(AlignSingleLineCaseStatements, true)
-      .setPreference(DoubleIndentClassDeclaration, true)
-  }
-
-  lazy val formatSettings = SbtScalariform.scalariformSettings ++ Seq(
-    ScalariformKeys.preferences in Compile := formattingPreferences,
-    ScalariformKeys.preferences in Test    := formattingPreferences
-  )
+      .setPreference(DoubleIndentConstructorArguments, true)
 }
