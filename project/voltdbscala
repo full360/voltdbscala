@@ -14,11 +14,15 @@ function compile_test {
   sbt ++$TRAVIS_SCALA_VERSION compile test
 }
 
-function publish {
+function test_publish {
   if [ "$TRAVIS_BRANCH" = "$TRAVIS_TAG" ]; then
+    echo "Compiling and testing"
+    compile_test
     echo "Publishing $TRAVIS_TAG to sonatype"
     sbt ++$TRAVIS_SCALA_VERSION publishSigned
   else
+    echo "Compiling and testing"
+    compile_test
     echo "Nothing to publishing to sonatype"
   fi
 }
@@ -34,11 +38,7 @@ function release {
 
 case "$1" in
   test)
-    compile_test
-    ;;
-
-  publish)
-    publish
+    test_publish
     ;;
 
   release)
@@ -46,6 +46,6 @@ case "$1" in
     ;;
 
   *)
-    echo $"Usage: $0 {test|publish|release}"
+    echo $"Usage: $0 {test|release}"
     exit 1
 esac
