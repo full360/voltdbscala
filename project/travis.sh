@@ -17,7 +17,7 @@ function compile_test {
 if [ "$TRAVIS_BRANCH" = "$TRAVIS_TAG" ]; then
   compile_test \
   && sbt ++$TRAVIS_SCALA_VERSION publishSigned \
-  && sbt ++$TRAVIS_SCALA_VERSION sonatypeRelease
+  && sbt ++$TRAVIS_SCALA_VERSION sonatypeReleaseAll
 else
   compile_test
 fi
