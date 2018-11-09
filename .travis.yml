@@ -1,8 +1,28 @@
 language: scala
 
+jdk:
+   - oraclejdk8
+
 scala:
    - 2.11.12
    - 2.12.6
+
+stages:
+  - test
+  - publish
+
+jobs:
+  include:
+    - stage: test
+      script: sbt ++$TRAVIS_SCALA_VERSION compile test
+    - stage: publish
+      scala: 2.12.6
+      script: project/publish.sh
+
+before_cache:
+  # Tricks to avoid unnecessary cache updates
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt -name "*.lock" -delete
 
 cache:
   directories:
@@ -10,20 +30,12 @@ cache:
     - $HOME/.sbt
     - $HOME/.ivy2
 
-script:
-  - project/travis.sh
-
-before_cache:
-  # Tricks to avoid unnecessary cache updates
-  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
-  - find $HOME/.sbt -name "*.lock" -delete
-
 before_install:
   - openssl aes-256-cbc -k "$ENC_PASSWORD" -in .secring.gpg.enc -out .secring.gpg -d
   - openssl aes-256-cbc -k "$ENC_PASSWORD" -in .pubring.gpg.enc -out .pubring.gpg -d
 
-jdk:
-   - oraclejdk8
+script:
+  - project/travis.sh
 
 notifications:
   email:
