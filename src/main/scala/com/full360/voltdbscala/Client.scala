@@ -74,8 +74,7 @@ trait Client {
    */
   def callProcedureAsync(procName: String, parameters: Any*)(implicit ec: ExecutionContext): Future[ClientResponse] =
     handleAsyncProcCall[ClientResponse] { promise ⇒
-      val cb = procedureCallback(promise.success(_))
-      javaClient.callProcedure(cb, procName, paramsToJavaObjects(parameters: _*): _*)
+      javaClient.callProcedure(procedureCallback(promise.success(_)), procName, paramsToJavaObjects(parameters: _*): _*)
     }
 
   /**
@@ -121,8 +120,7 @@ trait Client {
    */
   def updateClassesAsync(jarPath: File, classesToDelete: String)(implicit ec: ExecutionContext): Future[ClientResponse] =
     handleAsyncProcCall[ClientResponse] { promise ⇒
-      val cb = procedureCallback(promise.success(_))
-      javaClient.updateClasses(cb, jarPath, classesToDelete)
+      javaClient.updateClasses(procedureCallback(promise.success(_)), jarPath, classesToDelete)
     }
   /**
    * <p>Creates a new instance of a VoltBulkLoader that is bound to this Client.
@@ -172,8 +170,7 @@ trait Client {
    */
   def callAllPartitionProcedureAsync(procName: String, parameters: Any*)(implicit ec: ExecutionContext): Future[Seq[ClientResponseWithPartitionKey]] =
     handleAsyncProcCall[Seq[ClientResponseWithPartitionKey]] { promise ⇒
-      val cb = allPartitionProcedureCallback(promise.success(_))
-      javaClient.callAllPartitionProcedure(cb, procName, paramsToJavaObjects(parameters: _*): _*)
+      javaClient.callAllPartitionProcedure(allPartitionProcedureCallback(promise.success(_)), procName, paramsToJavaObjects(parameters: _*): _*)
     }
 
   /**
@@ -212,8 +209,7 @@ trait Client {
    */
   def callProcedureWithTimeoutAsync(queryTimeout: Int, procName: String, parameters: Any*)(implicit ec: ExecutionContext): Future[ClientResponse] =
     handleAsyncProcCall[ClientResponse] { promise ⇒
-      val cb = procedureCallback(promise.success(_))
-      javaClient.callProcedureWithTimeout(cb, queryTimeout, procName, paramsToJavaObjects(parameters: _*): _*)
+      javaClient.callProcedureWithTimeout(procedureCallback(promise.success(_)), queryTimeout, procName, paramsToJavaObjects(parameters: _*): _*)
     }
 
   /**
