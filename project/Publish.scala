@@ -47,8 +47,11 @@ object Publish {
     </scm>
     <developers>
       <developer>
-        <id>diorman</id>
-        <name>Diorman Colmenares</name>
+        <id>full360</id>
+        <name>Full 360</name>
+        <email>r-and-d@slack.full360.com</email>
+        <organization>Full 360 Inc</organization>
+        <organizationUrl>http://www.full360.com</organizationUrl>
       </developer>
     </developers>
   }
